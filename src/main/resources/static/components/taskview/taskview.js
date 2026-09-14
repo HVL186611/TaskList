@@ -20,6 +20,8 @@ class TaskView extends HTMLElement {
         this.attachShadow({mode: "open"});
 
         this.shadowRoot.appendChild(taskview.cloneNode(true));
-        
+
     }
 }
+
+customElements.define('group7-task-view', TaskList);

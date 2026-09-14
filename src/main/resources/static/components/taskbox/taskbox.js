@@ -1,7 +1,5 @@
 const taskbox = document.createElement("template");
 taskbox.innerHTML = `
-const template = document.createElement("template");
-template.innerHTML = `
     <link rel="stylesheet" type="text/css"
         href="${new URL('taskbox.css',import.meta.url)}">
     <dialog>
@@ -53,3 +51,5 @@ class TaskBox extends HTMLElement {
 
     }
 }
+
+customElements.define('group7-task-box', TaskBox);
