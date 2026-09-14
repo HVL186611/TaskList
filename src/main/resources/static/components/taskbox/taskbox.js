@@ -28,7 +28,8 @@ class TaskBox extends HTMLElement {
     - related event listeners
     */
    #dialog;
-   #addTaskCallbacks;
+   #newTaskCallbacks;
+   #statusList;
     constructor() {
         super();
 
@@ -40,31 +41,31 @@ class TaskBox extends HTMLElement {
             "click", this.close.bind(this)
         )
 
-        this.#addTaskCallbacks = [];
+        this.#newTaskCallbacks = [];
+        this.#statusList = [];
     }
 
-    show() {
-        
-        //this.shadowRoot.content = taskbox.content.cloneNode(true);
-        this.#dialog.show();
+    show() { this.#dialog.showModal(); }
+    close() { this.#dialog.close(); }
+
+    //StatusesList*
+    setStatuseslist(list) { 
+        "assuming this will only ever be run once";
+        this.#statusList = list; // dunno if i'll even need this
+        const select = this.shadowRoot.querySelector("select")
+        for (const status of list) {
+            const option = new Option(status, status);
+            select.appendChild(option);
+        }
     }
 
-    setStatusesList(list) {
-        
-    }
-
-    addNewTaskCallback(callback) {
-
-    }
-
-    close() {
-        this.#dialog.close();
-    }
+    // NewTask*
+    addNewTaskCallback(callback) { this.#newTaskCallbacks.push(callback); }
 
     addTask() {
         const name = this.shadowRoot.querySelector("input").textContent;
         const status = this.shadowRoot.querySelector("select").value; 
-        for (const callback of this.#addTaskCallbacks)
+        for (const callback of this.#newTaskCallbacks)
             callback(name, status)
     }
 }

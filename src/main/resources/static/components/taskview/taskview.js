@@ -32,12 +32,14 @@ class TaskView extends HTMLElement {
 
         this.#tasklist.addChangestatusCallback(this.changeStatus.bind(this));
         this.#tasklist.addDeletetaskCallback(this.deleteTask.bind(this));
-        
+
         this.#taskbox.addNewTaskCallback(this.addTask.bind(this));
     }
 
     loadStatuses() {
-
+        const statuses = ["WAITING", "ACTIVE", "DONE"]
+        this.#tasklist.setStatuseslist(statuses);
+        this.#taskbox.setStatuseslist(statuses);
     }
 
     loadTasks() {
@@ -67,7 +69,7 @@ class TaskView extends HTMLElement {
 }
 
 customElements.define('group7-task-view', TaskView);
-
+document.querySelector("group7-task-view").loadStatuses();
 
 /*
 // demo/test code from tasklist for copy/pasting to test taskview
