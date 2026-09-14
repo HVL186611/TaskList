@@ -27,16 +27,24 @@ class TaskBox extends HTMLElement {
     - X/close button
     - related event listeners
     */
+   #dialog;
     constructor() {
         super();
 
         this.attachShadow({mode: "open"});
 
-        this.shadowRoot.appendChild(taskbox.cloneNode(true));
+        this.shadowRoot.appendChild(taskbox.content.cloneNode(true));
+        this.#dialog = this.shadowRoot.querySelector("dialog");
+        this.#dialog.querySelector("span").addEventListener(
+            "click", this.close.bind(this)
+        )
+        this.#dialog.querySelector("span").cur
     }
 
     show() {
         
+        //this.shadowRoot.content = taskbox.content.cloneNode(true);
+        this.#dialog.show();
     }
 
     setStatusesList(list) {
@@ -48,7 +56,7 @@ class TaskBox extends HTMLElement {
     }
 
     close() {
-
+        this.#dialog.close();
     }
 }
 
