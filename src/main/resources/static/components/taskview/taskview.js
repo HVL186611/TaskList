@@ -46,8 +46,9 @@ class TaskView extends HTMLElement {
 
     }
 
-    addTask(name, status) {
-
+    addTask(task) {
+        "task.title, task.status";
+        this.#tasklist.showTask(task);
     }
 
     changeStatus(id, newStatus) {
