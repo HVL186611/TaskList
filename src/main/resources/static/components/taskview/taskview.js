@@ -21,6 +21,8 @@ class TaskView extends HTMLElement {
     constructor() {
         super();
 
+        this.serviceUrl = this.getAttribute("data-serviceurl");
+
         this.attachShadow({mode: "open"});
 
         this.shadowRoot.appendChild(taskview.content.cloneNode(true));
@@ -36,14 +38,24 @@ class TaskView extends HTMLElement {
         this.#taskbox.addNewTaskCallback(this.addTask.bind(this));
     }
 
-    loadStatuses() {
-        const statuses = ["WAITING", "ACTIVE", "DONE"]
+    async ftch(url) {
+        return await fetch(`${this.serviceUrl}${url}`)
+    }
+
+    async loadStatuses() {
+        const response = await this.ftch("/allstatuses");
+        const json = await response.json();
+        const statuses = json.allstatuses;
         this.#tasklist.setStatuseslist(statuses);
         this.#taskbox.setStatuseslist(statuses);
     }
 
-    loadTasks() {
-
+    async loadTasks() {
+        const response = await this.ftch("/tasklist");
+        const json = await response.json();
+        const tasks = json.tasks;
+        for (const task of tasks)
+            this.#tasklist.showTask(task);
     }
 
     addTask(task) {
@@ -56,7 +68,7 @@ class TaskView extends HTMLElement {
     }
 
     deleteTask(id) {
-
+        this.#tasklist.removeTask(id);
     }
 
     updateMessage() {
@@ -70,7 +82,9 @@ class TaskView extends HTMLElement {
 }
 
 customElements.define('group7-task-view', TaskView);
-document.querySelector("group7-task-view").loadStatuses();
+const view = document.querySelector("group7-task-view");
+view.loadStatuses();
+view.loadTasks();
 
 /*
 // demo/test code from tasklist for copy/pasting to test taskview

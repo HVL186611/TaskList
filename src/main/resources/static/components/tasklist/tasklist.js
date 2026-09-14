@@ -37,6 +37,7 @@ class TaskList extends HTMLElement {
         // kan visst bruke this.shadowRoot
         this.attachShadow({mode: "open"});
 
+
         this.statuses = [];
         this.#deleteCallbacks = [];
         this.#updateCallbacks = [];
