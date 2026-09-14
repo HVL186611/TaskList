@@ -28,6 +28,7 @@ class TaskBox extends HTMLElement {
     - related event listeners
     */
    #dialog;
+   #addTaskCallbacks;
     constructor() {
         super();
 
@@ -38,7 +39,8 @@ class TaskBox extends HTMLElement {
         this.#dialog.querySelector("span").addEventListener(
             "click", this.close.bind(this)
         )
-        this.#dialog.querySelector("span").cur
+
+        this.#addTaskCallbacks = [];
     }
 
     show() {
@@ -57,6 +59,13 @@ class TaskBox extends HTMLElement {
 
     close() {
         this.#dialog.close();
+    }
+
+    addTask() {
+        const name = this.shadowRoot.querySelector("input").textContent;
+        const status = this.shadowRoot.querySelector("select").value; 
+        for (const callback of this.#addTaskCallbacks)
+            callback(name, status)
     }
 }
 

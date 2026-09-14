@@ -17,6 +17,7 @@ taskview.innerHTML = `
 `;
 
 class TaskView extends HTMLElement {
+    #taskbox; #tasklist;
     constructor() {
         super();
 
@@ -25,10 +26,43 @@ class TaskView extends HTMLElement {
         this.shadowRoot.appendChild(taskview.content.cloneNode(true));
         this.shadowRoot.getElementById("newtask")
             .addEventListener("click", this.showNewTask.bind(this));
+        
+        this.#tasklist = this.shadowRoot.querySelector("group7-task-list");
+        this.#taskbox = this.shadowRoot.querySelector("group7-task-box");
+
+        this.#tasklist.addChangestatusCallback(this.changeStatus.bind(this));
+        this.#tasklist.addDeletetaskCallback(this.deleteTask.bind(this));
+        
+        this.#taskbox.addNewTaskCallback(this.addTask.bind(this));
     }
 
+    loadStatuses() {
+
+    }
+
+    loadTasks() {
+
+    }
+
+    addTask(name, status) {
+
+    }
+
+    changeStatus(id, newStatus) {
+
+    }
+
+    deleteTask(id) {
+
+    }
+
+    updateMessage() {
+
+    }
+
+
     showNewTask() {
-        this.shadowRoot.getElementById("taskbox").show();
+        this.#taskbox.show();
     }
 }
 

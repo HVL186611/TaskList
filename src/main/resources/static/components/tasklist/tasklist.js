@@ -79,6 +79,7 @@ class TaskList extends HTMLElement {
 
         return;
         // uhhhhhhhhhhhhhhhh cant get this to work
+        
         // add options to select dropdown
         const options = this.shadowRoot.querySelectorAll("option");
         for (let i in options) {
