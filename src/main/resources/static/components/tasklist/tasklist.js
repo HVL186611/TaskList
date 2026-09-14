@@ -232,10 +232,13 @@ class TaskList extends HTMLElement {
 
 
 customElements.define('group7-task-list', TaskList);
-
+export {
+    TaskList
+}
 // demo/test code from this point
 
 // velg tasklist elementet så vi kan bruke metoder
+/*
 const taskList = document.querySelector("group7-task-list");
 
 const statuses = ["WAITING", "ACTIVE", "DONE"]
@@ -275,7 +278,7 @@ taskList.addDeletetaskCallback(
         console.log(`Honk approved for ${id}`);
     }
 );
-
+//*/
 //taskList.setStatuseslist([])
 
 /*
