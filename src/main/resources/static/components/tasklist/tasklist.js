@@ -78,7 +78,8 @@ class TaskList extends HTMLElement {
         this.statuses = allstatuses;
 
         return;
-        // uhhhhhhhhhhhhhhhh cant get this to work
+        // uhhhhhhhhhhhhhhhh cant get this to work:
+
         // add options to select dropdown
         const options = this.shadowRoot.querySelectorAll("option");
         for (let i in options) {
@@ -232,7 +233,10 @@ class TaskList extends HTMLElement {
 
 
 customElements.define('group7-task-list', TaskList);
-
+export {
+    TaskList
+}
+/*
 // demo/test code from this point
 
 // velg tasklist elementet så vi kan bruke metoder
@@ -275,7 +279,7 @@ taskList.addDeletetaskCallback(
         console.log(`Honk approved for ${id}`);
     }
 );
-
+//*/
 //taskList.setStatuseslist([])
 
 /*
