@@ -16,6 +16,10 @@ taskview.innerHTML = `
     <group7-task-box id="taskbox"></group7-task-box>
 `;
 
+function success(json) {
+    return json.responseStatus;
+}
+
 class TaskView extends HTMLElement {
     #taskbox; #tasklist;
     constructor() {
@@ -39,12 +43,17 @@ class TaskView extends HTMLElement {
     }
 
     async ftch(url) {
+        // let's not paste this ugly thing all over the code
         return await fetch(`${this.serviceUrl}${url}`)
+        
     }
 
     async loadStatuses() {
         const response = await this.ftch("/allstatuses");
         const json = await response.json();
+
+        if (!success(json)) return; // update message?
+
         const statuses = json.allstatuses;
         this.#tasklist.setStatuseslist(statuses);
         this.#taskbox.setStatuseslist(statuses);
@@ -53,14 +62,31 @@ class TaskView extends HTMLElement {
     async loadTasks() {
         const response = await this.ftch("/tasklist");
         const json = await response.json();
+
+        if (!success(json)) return; // update message?
+        
         const tasks = json.tasks;
         for (const task of tasks)
             this.#tasklist.showTask(task);
     }
 
-    addTask(task) {
+    async addTask(task) {
         "task.title, task.status";
-        this.#tasklist.showTask(task);
+        let data = null;
+        try {
+            const response = await fetch(`${this.serviceUrl}/task`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json; charset=utf-8" },
+                body: JSON.stringify(task)
+            });
+            try {
+                data = await response.json()
+            } catch(e) { console.log(e); }
+        } catch(e) { console.log(e); }
+        
+        //this.#tasklist.showTask(task);
+
+        return data;
     }
 
     changeStatus(id, newStatus) {
@@ -84,6 +110,10 @@ class TaskView extends HTMLElement {
 customElements.define('group7-task-view', TaskView);
 const view = document.querySelector("group7-task-view");
 view.loadStatuses();
+await view.addTask({
+    title: "test",
+    status: "DONE"
+});
 view.loadTasks();
 
 /*
