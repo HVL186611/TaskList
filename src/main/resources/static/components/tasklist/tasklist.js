@@ -224,7 +224,7 @@ class TaskList extends HTMLElement {
      * @public
      * @return {Number} - Number of tasks on display in view
      */
-    getNumtasks() {
+    getNumtasks() { // NumTasks*
         /**
          * Fill inn the code
          */
