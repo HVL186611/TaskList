@@ -16,10 +16,6 @@ taskview.innerHTML = `
     <group7-task-box id="taskbox"></group7-task-box>
 `;
 
-function success(json) {
-    return json.responseStatus;
-}
-
 class TaskView extends HTMLElement {
     #taskbox; #tasklist;
     constructor() {
@@ -43,6 +39,10 @@ class TaskView extends HTMLElement {
         //this.#taskbox.addNewTaskCallback(this.showNewTask.bind(this)); // separating these for testing
     }
 
+    success(json) { 
+        return json.responseStatus;
+    }
+
     async ftch(url) {
         // let's not paste this ugly thing all over the code
         return await fetch(`${this.serviceUrl}${url}`)
@@ -57,7 +57,7 @@ class TaskView extends HTMLElement {
         const response = await this.ftch("/allstatuses");
         const json = await response.json();
 
-        if (!success(json)) return; // update message?
+        if (!this.success(json)) return; // update message?
 
         const statuses = json.allstatuses;
         for (const i in statuses) {
@@ -72,7 +72,7 @@ class TaskView extends HTMLElement {
             const response = await this.ftch("/tasklist");
             const json = await response.json();
 
-            if (!success(json)) return; // update message?
+            if (!this.success(json)) return; // update message?
             
             const tasks = json.tasks;
             for (const task of tasks) {
