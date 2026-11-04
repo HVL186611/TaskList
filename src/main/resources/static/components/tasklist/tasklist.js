@@ -18,10 +18,10 @@ taskrow.innerHTML = `
         <td></td>
         <td>
             <select>
-                <option value="0" selected>&lt;Quack&gt;</option>
+                <option value="0" selected>&lt;Modify&gt;</option>
             </select>
         </td>
-        <td><button type="button">Honk</button></td>
+        <td><button type="button">Remove</button></td>
     </tr>`;
 
 /**
@@ -142,6 +142,11 @@ class TaskList extends HTMLElement {
         
         // clone row template and modify
         const newRow = taskrow.content.cloneNode(true);
+
+        // replace annoying template text
+        newRow.querySelector("option").textContent = "<Quack>";
+        newRow.querySelector("button").textContent = "Honk";
+
         newRow.firstElementChild.dataset.taskid = task.id; // set <tr id=task.id></tr>
         const cells = newRow.querySelectorAll("td");
 
