@@ -226,7 +226,14 @@ class TaskList extends HTMLElement {
         /**
          * Fill inn the code
          */
-        return this.#root.querySelectorAll("tbody tr").length; // i thought for sure this wasn't gonna work first try but here we are 🦆
+        
+        //return this.#root.querySelectorAll("tbody tr").length; // i thought for sure this wasn't gonna work first try but here we are 🦆
+
+        const table = this.#root.querySelector("table");
+
+        if (table === null) return 0;
+
+        return table.tBodies[0].rows.length;
     }
 }
 
