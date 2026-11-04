@@ -8,7 +8,7 @@ taskview.innerHTML = `
     <h1>Tasks</h1>
     <div id="message"><p>Waiting for server data.</p></div>
     <div id="newtask">
-        <button type="button">New task</button>
+        <button type="button" disabled>New task</button>
     </div>
     <!-- The task list -->
     <group7-task-list id="tasklist"></group7-task-list>
@@ -20,6 +20,8 @@ class TaskView extends HTMLElement {
     #taskbox; #tasklist;
     constructor() {
         super();
+
+        this.serviceUrl = this.getAttribute("data-serviceurl");
 
         this.attachShadow({mode: "open"});
 
@@ -34,33 +36,121 @@ class TaskView extends HTMLElement {
         this.#tasklist.addDeletetaskCallback(this.deleteTask.bind(this));
 
         this.#taskbox.addNewTaskCallback(this.addTask.bind(this));
+        //this.#taskbox.addNewTaskCallback(this.showNewTask.bind(this)); // separating these for testing
     }
 
-    loadStatuses() {
-        const statuses = ["WAITING", "ACTIVE", "DONE"]
+    success(json) { 
+        return json.responseStatus;
+    }
+
+    async ftch(url) {
+        // let's not paste this ugly thing all over the code
+        return await fetch(`${this.serviceUrl}${url}`)
+        
+    }
+    url(path) {
+        // this.ftch wasnt enough
+        return `${this.serviceUrl}${path}`;
+    }
+
+    async loadStatuses() {
+        const response = await this.ftch("/allstatuses");
+        const json = await response.json();
+
+        if (!this.success(json)) return; // update message?
+
+        const statuses = json.allstatuses;
+        for (const i in statuses) {
+            statuses[i] = statuses[i].toUpperCase();
+        }
         this.#tasklist.setStatuseslist(statuses);
         this.#taskbox.setStatuseslist(statuses);
     }
 
-    loadTasks() {
+    async loadTasks() {
+        try {
+            const response = await this.ftch("/tasklist");
+            const json = await response.json();
 
+            if (!this.success(json)) return; // update message?
+            
+            const tasks = json.tasks;
+            for (const task of tasks) {
+                task.status = task.status.toUpperCase();
+                this.#tasklist.showTask(task);
+            }
+
+            // enable new task button
+            this.shadowRoot.querySelector("button").disabled = false;
+
+            // update message
+            this.updateMessage();
+        } catch(e) { console.log(e); }
     }
 
-    addTask(task) {
+    async addTask(task) {
         "task.title, task.status";
-        this.#tasklist.showTask(task);
+        let data = null;
+        task.status = task.status.toLowerCase();
+        try {
+            const response = await fetch(`${this.serviceUrl}/task`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json; charset=utf-8" },
+                body: JSON.stringify(task)
+            });
+            try {
+                data = await response.json()
+                if (!data.responseStatus) return;
+                data.task.status = data.task.status.toUpperCase();
+                this.#tasklist.showTask(data.task); // so sometimes the task is in data.task and sometimes the task is in data
+                this.updateMessage();
+            } catch(e) { console.log(e); }
+        } catch(e) { console.log(e); }
+        
+        return data;
     }
 
-    changeStatus(id, newStatus) {
-
+    async changeStatus(id, newStatus) {
+        try {
+            const response = await fetch(`${this.serviceUrl}/task/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json; charset=utf-8" },
+                body: JSON.stringify({status: newStatus.toLowerCase()})
+            });
+            const data = await response.json();
+            //console.log(data);
+            if (!data.responseStatus) return;
+            data.status = data.status.toUpperCase();
+            this.#tasklist.updateTask(data);
+        } catch(e) { console.log(e); }
     }
 
-    deleteTask(id) {
-
+    async deleteTask(id) {
+        console.log(`Deleting task id=${id}`)
+        try {
+            const response = await fetch(this.url(`/task/${id}`), {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json; charset=utf-8" }
+            });
+            const data = await response.json();
+            if (!data.responseStatus) return;
+            this.#tasklist.removeTask(id);
+            this.updateMessage();
+        } catch(e) {
+            return false;
+        }
     }
 
     updateMessage() {
+        let msg = "Found ";
+        const n = this.#tasklist.getNumtasks(); // i'd rather get this from the api, but i assume taslist needed this method for a reason
+        if (n == 0) msg = "No tasks were found";
+        else {
+            msg += n;
+            msg += " tasks."
+        }
 
+        this.shadowRoot.getElementById("message").textContent = msg;
     }
 
 
@@ -70,7 +160,12 @@ class TaskView extends HTMLElement {
 }
 
 customElements.define('group7-task-view', TaskView);
-document.querySelector("group7-task-view").loadStatuses();
+const views = document.querySelectorAll("group7-task-view");
+for (const view of views) {
+    await view.loadStatuses();
+    await view.loadTasks();
+}
+
 
 /*
 // demo/test code from tasklist for copy/pasting to test taskview

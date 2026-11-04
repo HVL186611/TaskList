@@ -71,6 +71,7 @@ class TaskBox extends HTMLElement {
         const status = this.shadowRoot.querySelector("select").value; 
         for (const callback of this.#newTaskCallbacks)
             callback({title: name, status: status})
+        this.close();
     }
 }
 

@@ -37,6 +37,7 @@ class TaskList extends HTMLElement {
         // kan visst bruke this.shadowRoot
         this.attachShadow({mode: "open"});
 
+
         this.statuses = [];
         this.#deleteCallbacks = [];
         this.#updateCallbacks = [];
@@ -223,7 +224,7 @@ class TaskList extends HTMLElement {
      * @public
      * @return {Number} - Number of tasks on display in view
      */
-    getNumtasks() {
+    getNumtasks() { // NumTasks*
         /**
          * Fill inn the code
          */
