@@ -46,11 +46,15 @@ class TaskBox extends HTMLElement {
         this.#statusList = [];
 
         this.#root.querySelector("button").addEventListener(
-            "click", this.addTask.bind(this)
+            "click", this.#addTask.bind(this)
         );
     }
 
-    show() { this.#dialog.showModal(); }
+    show() { 
+        this.#root.querySelector("input").value = "";
+        this.#root.querySelector("select").selectedIndex = 0;
+        this.#dialog.showModal();
+    }
     close() { this.#dialog.close(); }
 
     //StatusesList*
@@ -67,9 +71,10 @@ class TaskBox extends HTMLElement {
     // NewTask*
     addNewTaskCallback(callback) { this.#newTaskCallbacks.push(callback); }
 
-    addTask() {
+    #addTask() {
         const name = this.#root.querySelector("input").value;
         const status = this.#root.querySelector("select").value; 
+        if (!name.trim() || !status) return;
         for (const callback of this.#newTaskCallbacks)
             callback({title: name, status: status})
         this.close();

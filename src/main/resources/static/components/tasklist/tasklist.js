@@ -42,7 +42,7 @@ class TaskList extends HTMLElement {
         this.#root = this.attachShadow({mode: "closed"});
 
 
-        this.statuses = []; //
+        this.#statuses = []; //
         this.#deleteCallbacks = [];
         this.#updateCallbacks = [];
 
@@ -51,9 +51,14 @@ class TaskList extends HTMLElement {
         //this.#root.appendChild(tasktable.content.cloneNode(true)); // moving to showtask
     }
 
-    onStatusChange(id, newStatus) {
-        if (newStatus == 0) return; // default option
-        const e = this.#root.getElementById(id);
+    #onStatusChange(id, newStatus) {
+        if (newStatus === 0) return; // default option
+        const e = this.#findRow(id);
+        if (!e) return;
+
+        const currentStatus = e.cells[1].textContent;
+        if (newStatus === currentStatus) return;
+        
         const userConfirm = confirm(`Set "${e.querySelector("td").textContent}" status to "${newStatus}"?`);
 
         if (userConfirm) {
@@ -62,8 +67,9 @@ class TaskList extends HTMLElement {
             }
         }
     }
-    onDelete(id) {
-        const e = this.#root.getElementById(id);
+    #onDelete(id) {
+        const e = this.#findRow(id);
+        if (!e) return;
         const userConfirm = confirm(`Are you sure you want to honk "${e.querySelector("td").textContent}"?`);
         if (userConfirm) {
             for (let i in this.#deleteCallbacks)
@@ -80,25 +86,7 @@ class TaskList extends HTMLElement {
         /**
          * Fill inn the code
          */
-        this.statuses = allstatuses;
-
-        return;
-        // uhhhhhhhhhhhhhhhh cant get this to work:
-
-        // add options to select dropdown
-        const options = this.#root.querySelectorAll("option");
-        for (let i in options) {
-            console.log(options[i].content);
-            //options[i].remove();
-        }
-        const selects = this.#root.querySelectorAll("select");
-        if (selects == null) return;
-        for (let i in selects) {
-            console.log(selects[i]);
-            for (let s in this.statuses) {
-                selects[i].appendChild(new Option(this.statuses[s]))
-            }
-        }
+        this.#statuses = allstatuses;
     }
 
     /**
@@ -126,6 +114,11 @@ class TaskList extends HTMLElement {
 
     }
 
+    #findRow(id) {
+        return [...this.#root.querySelectorAll("tbody tr")]
+            .find(row => row.dataset.taskid === String(id));
+    }
+
     /**
      * Add task at top in list of tasks in the view
      * @public
@@ -140,7 +133,7 @@ class TaskList extends HTMLElement {
         const tasklist = this.#root.getElementById("tasklist");
 
         const table = this.#root.querySelector("table");
-        if (table == null)
+        if (table === null)
             tasklist.appendChild(tasktable.content.cloneNode(true));
 
 
@@ -149,7 +142,7 @@ class TaskList extends HTMLElement {
         
         // clone row template and modify
         const newRow = taskrow.content.cloneNode(true);
-        newRow.firstElementChild.id = task.id; // set <tr id=task.id></tr>
+        newRow.firstElementChild.dataset.taskid = task.id; // set <tr id=task.id></tr>
         const cells = newRow.querySelectorAll("td");
 
         // display title and status
@@ -158,16 +151,16 @@ class TaskList extends HTMLElement {
 
         // remove callback on button
         newRow.querySelector("button").addEventListener(
-            "click", () => {this.onDelete(task.id);}
+            "click", () => {this.#onDelete(task.id);}
         );
 
         // add options to select dropdown
         const select = newRow.querySelector("select");
-        for (let s in this.statuses) {
-            //select.appendChild(new Option(this.statuses[s])) // "No additional innerHTML or createElement should be needed"
+        for (let s in this.#statuses) {
+            //select.appendChild(new Option(this.#statuses[s])) // "No additional innerHTML or createElement should be needed"
             const option = select.firstElementChild.cloneNode(true);
-            option.value = this.statuses[s];
-            option.textContent = this.statuses[s];
+            option.value = this.#statuses[s];
+            option.textContent = this.#statuses[s];
             option.selected = false;
 
             select.appendChild(option);
@@ -176,7 +169,7 @@ class TaskList extends HTMLElement {
         // add callback to select
         select.addEventListener("change", 
             (e) => {
-                this.onStatusChange(task.id, e.target.value);
+                this.#onStatusChange(task.id, e.target.value);
                 e.target.value = "0"; // switch back to quack
             }
         );
@@ -189,10 +182,6 @@ class TaskList extends HTMLElement {
 
     }
 
-    askUpdate(id, status) {
-
-    }
-
     /**
      * Update the status of a task in the view
      * @param {Object} task - Object with attributes {'id':taskId,'status':newStatus}
@@ -201,7 +190,7 @@ class TaskList extends HTMLElement {
         /**
          * Fill inn the code
          */
-        const e = this.#root.getElementById(task.id);
+        const e = this.#findRow(task.id);
         e.querySelectorAll("td")[1].textContent = task.status;
     }
 
@@ -213,14 +202,14 @@ class TaskList extends HTMLElement {
         /**
          * Fill inn the code
          */
-        const e = this.#root.getElementById(id);
+        const e = this.#findRow(id);
 
         console.log(`Removing task id=${id}`);
         e.remove(); // delete element
 
         // remove table if there are no rows
         const row = this.#root.querySelector("tbody tr"); // avoid counting tr in thead
-        if (row == null)
+        if (row === null)
             this.#root.querySelector("table").remove();
     }
 
