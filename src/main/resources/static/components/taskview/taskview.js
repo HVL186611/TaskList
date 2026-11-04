@@ -17,20 +17,20 @@ taskview.innerHTML = `
 `;
 
 class TaskView extends HTMLElement {
-    #taskbox; #tasklist;
+    #taskbox; #tasklist; #root;
     constructor() {
         super();
 
         this.serviceUrl = this.getAttribute("data-serviceurl");
 
-        this.attachShadow({mode: "open"});
+        this.#root = this.attachShadow({mode: "closed"});
 
-        this.shadowRoot.appendChild(taskview.content.cloneNode(true));
-        this.shadowRoot.getElementById("newtask")
+        this.#root.appendChild(taskview.content.cloneNode(true));
+        this.#root.getElementById("newtask")
             .addEventListener("click", this.showNewTask.bind(this));
         
-        this.#tasklist = this.shadowRoot.querySelector("group7-task-list");
-        this.#taskbox = this.shadowRoot.querySelector("group7-task-box");
+        this.#tasklist = this.#root.querySelector("group7-task-list");
+        this.#taskbox = this.#root.querySelector("group7-task-box");
 
         this.#tasklist.addChangestatusCallback(this.changeStatus.bind(this));
         this.#tasklist.addDeletetaskCallback(this.deleteTask.bind(this));
@@ -81,7 +81,7 @@ class TaskView extends HTMLElement {
             }
 
             // enable new task button
-            this.shadowRoot.querySelector("button").disabled = false;
+            this.#root.querySelector("button").disabled = false;
 
             // update message
             this.updateMessage();
@@ -150,7 +150,7 @@ class TaskView extends HTMLElement {
             msg += " tasks."
         }
 
-        this.shadowRoot.getElementById("message").textContent = msg;
+        this.#root.getElementById("message").textContent = msg;
     }
 
 

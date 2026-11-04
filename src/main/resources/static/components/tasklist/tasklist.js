@@ -31,25 +31,29 @@ taskrow.innerHTML = `
 class TaskList extends HTMLElement {
     #deleteCallbacks;
     #updateCallbacks;
+
+    // 
+    #root;
+    #statuses = [];
     constructor() {
         super();
         //this.#shadow = this.AttachShadow({mode: "open"});
-        // kan visst bruke this.shadowRoot
-        this.attachShadow({mode: "open"});
+        // kan visst bruke this.#root
+        this.#root = this.attachShadow({mode: "closed"});
 
 
-        this.statuses = [];
+        this.statuses = []; //
         this.#deleteCallbacks = [];
         this.#updateCallbacks = [];
 
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.#root.appendChild(template.content.cloneNode(true));
 
-        //this.shadowRoot.appendChild(tasktable.content.cloneNode(true)); // moving to showtask
+        //this.#root.appendChild(tasktable.content.cloneNode(true)); // moving to showtask
     }
 
     onStatusChange(id, newStatus) {
         if (newStatus == 0) return; // default option
-        const e = this.shadowRoot.getElementById(id);
+        const e = this.#root.getElementById(id);
         const userConfirm = confirm(`Set "${e.querySelector("td").textContent}" status to "${newStatus}"?`);
 
         if (userConfirm) {
@@ -59,7 +63,7 @@ class TaskList extends HTMLElement {
         }
     }
     onDelete(id) {
-        const e = this.shadowRoot.getElementById(id);
+        const e = this.#root.getElementById(id);
         const userConfirm = confirm(`Are you sure you want to honk "${e.querySelector("td").textContent}"?`);
         if (userConfirm) {
             for (let i in this.#deleteCallbacks)
@@ -82,12 +86,12 @@ class TaskList extends HTMLElement {
         // uhhhhhhhhhhhhhhhh cant get this to work:
 
         // add options to select dropdown
-        const options = this.shadowRoot.querySelectorAll("option");
+        const options = this.#root.querySelectorAll("option");
         for (let i in options) {
             console.log(options[i].content);
             //options[i].remove();
         }
-        const selects = this.shadowRoot.querySelectorAll("select");
+        const selects = this.#root.querySelectorAll("select");
         if (selects == null) return;
         for (let i in selects) {
             console.log(selects[i]);
@@ -133,15 +137,15 @@ class TaskList extends HTMLElement {
          */
 
         // generate table if it doesnt exist
-        const tasklist = this.shadowRoot.getElementById("tasklist");
+        const tasklist = this.#root.getElementById("tasklist");
 
-        const table = this.shadowRoot.querySelector("table");
+        const table = this.#root.querySelector("table");
         if (table == null)
             tasklist.appendChild(tasktable.content.cloneNode(true));
 
 
         // select table body
-        const tbody = this.shadowRoot.querySelector("tbody");
+        const tbody = this.#root.querySelector("tbody");
         
         // clone row template and modify
         const newRow = taskrow.content.cloneNode(true);
@@ -197,7 +201,7 @@ class TaskList extends HTMLElement {
         /**
          * Fill inn the code
          */
-        const e = this.shadowRoot.getElementById(task.id);
+        const e = this.#root.getElementById(task.id);
         e.querySelectorAll("td")[1].textContent = task.status;
     }
 
@@ -209,15 +213,15 @@ class TaskList extends HTMLElement {
         /**
          * Fill inn the code
          */
-        const e = this.shadowRoot.getElementById(id);
+        const e = this.#root.getElementById(id);
 
         console.log(`Removing task id=${id}`);
         e.remove(); // delete element
 
         // remove table if there are no rows
-        const row = this.shadowRoot.querySelector("tbody tr"); // avoid counting tr in thead
+        const row = this.#root.querySelector("tbody tr"); // avoid counting tr in thead
         if (row == null)
-            this.shadowRoot.querySelector("table").remove();
+            this.#root.querySelector("table").remove();
     }
 
     /**
@@ -228,90 +232,9 @@ class TaskList extends HTMLElement {
         /**
          * Fill inn the code
          */
-        return this.shadowRoot.querySelectorAll("tbody tr").length; // i thought for sure this wasn't gonna work first try but here we are 🦆
+        return this.#root.querySelectorAll("tbody tr").length; // i thought for sure this wasn't gonna work first try but here we are 🦆
     }
 }
 
 
 customElements.define('group7-task-list', TaskList);
-export {
-    TaskList
-}
-/*
-// demo/test code from this point
-
-// velg tasklist elementet så vi kan bruke metoder
-const taskList = document.querySelector("group7-task-list");
-
-const statuses = ["WAITING", "ACTIVE", "DONE"]
-taskList.setStatuseslist(statuses);
-
-const tasks = [
-    {
-        id: 1,
-        status: "DONE",
-        title: "Look at ducks"
-    },
-    {
-        id: 2,
-        status: "ACTIVE",
-        title: "Feed ducks"
-    },
-    {
-        id: 3,
-        status: "WAITING",
-        title: "Say bye to ducks :("
-    },
-    {
-        id: 4,
-        status: "ACTIVE",
-        title: "Chase away geese"
-    }
-]
-
-for (let t of tasks) {
-    taskList.showTask(t);
-}
-
-const status = {id: 4, status: "DONE"};
-taskList.updateTask(status);
-taskList.addDeletetaskCallback(
-    (id) => {
-        console.log(`Honk approved for ${id}`);
-    }
-);
-//*/
-//taskList.setStatuseslist([])
-
-/*
-
-// update status without ajax
-taskList.addChangestatusCallback(
-    (id, newStatus) => {
-        const row = taskList.shadowRoot.getElementById(id);
-        row.querySelectorAll("td")[1].textContent = newStatus; // should use tasklist.updateTask
-    }
-);
-*/
-
-
-/*
-
-TODO:
-    -not done
-        ---done
-
-    -Use the outer template with #tasklist
-        ---Only create the table when the first task is shown
-        ---Remove the table/header when the last task is removed
-    -Finish setStatuseslist() (unless statuses should only be set once)
-        ---Finish onStatusChange(id, newStatus)
-        ---Add "change" listener to each <select>
-        ---Finish onDelete(id)
-        ---Make delete button call onDelete(), not removeTask()
-        ---Move confirmation/callback logic out of removeTask()
-        ---Fix #deleteCallbacks to this.#deleteCallbacks
-        ---Make removeTask() only remove the row/view
-        ---Remove the whole table when task count reaches 0 (could do this with callbacks but i just added it to removeTask)
-    -Remove test/demo code from the final component file
- */

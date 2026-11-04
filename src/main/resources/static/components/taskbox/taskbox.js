@@ -30,13 +30,14 @@ class TaskBox extends HTMLElement {
    #dialog;
    #newTaskCallbacks;
    #statusList;
+   #root;
     constructor() {
         super();
 
-        this.attachShadow({mode: "open"});
+        this.#root = this.attachShadow({mode: "closed"});
 
-        this.shadowRoot.appendChild(taskbox.content.cloneNode(true));
-        this.#dialog = this.shadowRoot.querySelector("dialog");
+        this.#root.appendChild(taskbox.content.cloneNode(true));
+        this.#dialog = this.#root.querySelector("dialog");
         this.#dialog.querySelector("span").addEventListener(
             "click", this.close.bind(this)
         )
@@ -44,7 +45,7 @@ class TaskBox extends HTMLElement {
         this.#newTaskCallbacks = [];
         this.#statusList = [];
 
-        this.shadowRoot.querySelector("button").addEventListener(
+        this.#root.querySelector("button").addEventListener(
             "click", this.addTask.bind(this)
         );
     }
@@ -56,7 +57,7 @@ class TaskBox extends HTMLElement {
     setStatuseslist(list) { 
         "assuming this will only ever be run once";
         this.#statusList = list; // dunno if i'll even need this
-        const select = this.shadowRoot.querySelector("select")
+        const select = this.#root.querySelector("select")
         for (const status of list) {
             const option = new Option(status, status);
             select.appendChild(option);
@@ -67,8 +68,8 @@ class TaskBox extends HTMLElement {
     addNewTaskCallback(callback) { this.#newTaskCallbacks.push(callback); }
 
     addTask() {
-        const name = this.shadowRoot.querySelector("input").value;
-        const status = this.shadowRoot.querySelector("select").value; 
+        const name = this.#root.querySelector("input").value;
+        const status = this.#root.querySelector("select").value; 
         for (const callback of this.#newTaskCallbacks)
             callback({title: name, status: status})
         this.close();
