@@ -143,7 +143,7 @@ class TaskList extends HTMLElement {
         // clone row template and modify
         const newRow = taskrow.content.cloneNode(true);
 
-        // replace annoying template text
+        // replace template text
         newRow.querySelector("option").textContent = "<Quack>";
         newRow.querySelector("button").textContent = "Honk";
 
