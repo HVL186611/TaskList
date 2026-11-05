@@ -61,7 +61,11 @@ class TaskView extends HTMLElement {
         const response = await this.#ftch("/allstatuses");
         const json = await response.json();
 
-        if (!this.#success(json)) return; // update message?
+        if (!this.#success(json)) {
+            //this.#updateMessage(); // should've made a version that allows passing message string param
+            this.#root.getElementById("message").textContent = "Failed to load statuses."; // hopefully works
+            return;
+        }
 
         const statuses = json.allstatuses;
         for (const i in statuses) {
@@ -78,7 +82,7 @@ class TaskView extends HTMLElement {
 
             if (!this.#success(json)) {
                 this.#updateMessage();
-                this.#root.querySelector("button").disabled = false;
+                this.#root.querySelector("button").disabled = false; // maybe stay gray instead?
                 return;
             }
 

@@ -115,8 +115,13 @@ class TaskList extends HTMLElement {
     }
 
     #findRow(id) {
-        return [...this.#root.querySelectorAll("tbody tr")]
-            .find(row => row.dataset.taskid === String(id));
+        const table = this.#root.querySelector("table");
+        if (table == null) return;
+
+        for (let row of table.tBodies[0].rows) {
+            if (row.dataset.taskid == id)
+                return row;
+        }
     }
 
     /**
@@ -175,7 +180,7 @@ class TaskList extends HTMLElement {
         select.addEventListener("change", 
             (e) => {
                 this.#onStatusChange(task.id, e.target.value);
-                e.target.value = "0"; // switch back to quack
+                e.target.value = "0"; // switch back to <quack>
             }
         );
 
